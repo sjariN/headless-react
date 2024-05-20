@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
 
-function App() {
+const App = () => {
+  const [phone,setPhone] = useState(null);
+  const callback = (otplessUser) => {
+
+    alert(JSON.stringify(otplessUser))
+    // Implement your custom logic here.
+  };
+  
+  useEffect(() => {
+    // Load the SDK dynamically
+    const script = document.createElement('script')
+    script.id = 'otpless-sdk'
+    script.type = 'text/javascript'
+    script.src = 'https://otpless.com/v2/headless.js'
+    script.setAttribute('data-appid',"AKQ65ZPGYITFQ4UQK65O")
+    script.onload = () => {
+        window.OTPlessSignin = new window.OTPless(callback);
+    };
+    document.head.appendChild(script);
+    return () => {
+        document.head.removeChild(script);
+    };
+}, []);
+
+  const phoneAuth = (phno) => {
+    setPhone(phno);
+    window.OTPlessSignin.initiate({
+        channel: "PHONE",
+        phone: phno,
+        countryCode: "+91",
+    });
+};
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div id="mobile-section">
+        <input id="mobile-input" placeholder="Enter mobile number" />
+        <button onClick={()=>phoneAuth(document.getElementById('mobile-input').value)}>Verify</button>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
